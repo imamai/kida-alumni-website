@@ -1,0 +1,13 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="KIDA — Kibabiians Development Association">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0bc55" />
+      <stop offset="1" stop-color="#c89b2b" />
+    </linearGradient>
+  </defs>
+  <path d="M40 20 H160 V120 C160 165 130 185 100 195 C70 185 40 165 40 120 Z" fill="url(#gold)" stroke="#2f2483" stroke-width="6" />
+  <rect x="40" y="20" width="120" height="14" fill="#982b2b" />
+  <text x="100" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="700" fill="#2f2483">KIDA</text>
+  <text x="100" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#1f1f1f">DEVELOPMENT ASSOC.</text>
+  <path d="M60 130 L80 150 L100 118 L120 150 L140 130" stroke="#982b2b" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -1,0 +1,167 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading);
+  --color-kida-purple: var(--kida-purple);
+  --color-kida-purple-light: var(--kida-purple-light);
+  --color-kida-purple-dark: var(--kida-purple-dark);
+  --color-kida-maroon: var(--kida-maroon);
+  --color-kida-gold: var(--kida-gold);
+  --color-kida-gold-light: var(--kida-gold-light);
+  --color-kida-charcoal: var(--kida-charcoal);
+  --color-kida-ivory: var(--kida-ivory);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* KIDA brand palette — do not alter without updating the logo/brand guide */
+  --kida-purple: #2f2483;
+  --kida-purple-light: #4a3caf;
+  --kida-purple-dark: #201a5c;
+  --kida-maroon: #982b2b;
+  --kida-gold: #c89b2b;
+  --kida-gold-light: #e0bc55;
+  --kida-charcoal: #1f1f1f;
+  --kida-ivory: #f8f6ef;
+
+  --background: var(--kida-ivory);
+  --foreground: var(--kida-charcoal);
+  --card: #ffffff;
+  --card-foreground: var(--kida-charcoal);
+  --popover: #ffffff;
+  --popover-foreground: var(--kida-charcoal);
+  --primary: var(--kida-purple);
+  --primary-foreground: #ffffff;
+  --secondary: var(--kida-gold);
+  --secondary-foreground: var(--kida-charcoal);
+  --muted: #eeece1;
+  --muted-foreground: #5c5a52;
+  --accent: var(--kida-maroon);
+  --accent-foreground: #ffffff;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #e3e0d3;
+  --input: #e3e0d3;
+  --ring: var(--kida-purple);
+  --chart-1: var(--kida-purple);
+  --chart-2: var(--kida-gold);
+  --chart-3: var(--kida-maroon);
+  --chart-4: #6b6349;
+  --chart-5: #a89f7f;
+  --radius: 0.625rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--kida-charcoal);
+  --sidebar-primary: var(--kida-purple);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--kida-gold);
+  --sidebar-accent-foreground: var(--kida-charcoal);
+  --sidebar-border: #e3e0d3;
+  --sidebar-ring: var(--kida-purple);
+}
+
+.dark {
+  --background: #16141f;
+  --foreground: #f4f2ea;
+  --card: #1d1a2b;
+  --card-foreground: #f4f2ea;
+  --popover: #1d1a2b;
+  --popover-foreground: #f4f2ea;
+  --primary: #8f83d6;
+  --primary-foreground: #16141f;
+  --secondary: var(--kida-gold);
+  --secondary-foreground: #16141f;
+  --muted: #262238;
+  --muted-foreground: #a7a2b8;
+  --accent: #c14f4f;
+  --accent-foreground: #ffffff;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: #8f83d6;
+  --chart-1: #8f83d6;
+  --chart-2: var(--kida-gold);
+  --chart-3: #c14f4f;
+  --chart-4: #a89f7f;
+  --chart-5: #6b6349;
+  --sidebar: #1d1a2b;
+  --sidebar-foreground: #f4f2ea;
+  --sidebar-primary: #8f83d6;
+  --sidebar-primary-foreground: #16141f;
+  --sidebar-accent: var(--kida-gold);
+  --sidebar-accent-foreground: #16141f;
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: #8f83d6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
