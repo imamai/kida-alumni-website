@@ -55,7 +55,7 @@ export async function uploadLogo(_prevState: SettingsActionState, formData: Form
 
   const { error: settingsError } = await supabase
     .from("kida_settings")
-    .update({ value: JSON.stringify(publicUrl), updated_by: user?.id })
+    .update({ value: publicUrl, updated_by: user?.id })
     .eq("key", "logo_url");
 
   if (settingsError) {
@@ -94,7 +94,7 @@ export async function updateBrandingSettings(
   const user = await getCurrentUser();
 
   const updates = Object.entries(parsed.data).map(([key, value]) =>
-    supabase.from("kida_settings").update({ value: JSON.stringify(value), updated_by: user?.id }).eq("key", key),
+    supabase.from("kida_settings").update({ value, updated_by: user?.id }).eq("key", key),
   );
   const results = await Promise.all(updates);
   if (results.some((r) => r.error)) {
