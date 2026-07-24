@@ -69,7 +69,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     { label: "Registered Alumni", value: 12500, suffix: "+" },
     { label: "Counties Represented", value: 47 },
     { label: "Scholarships Awarded", value: 320, suffix: "+" },
-    { label: "Active Chapters", value: 18 },
+    { label: "Diaspora Countries", value: 18 },
   ],
 };
 

@@ -106,3 +106,54 @@ export async function updateBrandingSettings(
 
   return { status: "success", message: "Branding settings saved." };
 }
+
+const impactStatSchema = z.object({
+  label: z.string().trim().min(1),
+  value: z.coerce.number().int().min(0),
+  suffix: z.string().trim().optional(),
+});
+const impactStatsSchema = z.array(impactStatSchema).min(1).max(8);
+
+export async function updateImpactStats(
+  _prevState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  if (!(await isStaff())) {
+    return { status: "error", message: "You don't have permission to do that." };
+  }
+
+  const count = Number(formData.get("stat_count") ?? 0);
+  const stats = Array.from({ length: count }, (_, i) => ({
+    label: formData.get(`stat_${i}_label`),
+    value: formData.get(`stat_${i}_value`),
+    suffix: formData.get(`stat_${i}_suffix`) || undefined,
+  }));
+
+  const parsed = impactStatsSchema.safeParse(stats);
+  if (!parsed.success) {
+    return { status: "error", message: "Check the form and try again." };
+  }
+
+  const cleaned = parsed.data.map((stat) => ({
+    label: stat.label,
+    value: stat.value,
+    ...(stat.suffix ? { suffix: stat.suffix } : {}),
+  }));
+
+  const supabase = await createClient();
+  const user = await getCurrentUser();
+
+  const { error } = await supabase
+    .from("kida_settings")
+    .update({ value: cleaned, updated_by: user?.id })
+    .eq("key", "impact_stats");
+
+  if (error) {
+    return { status: "error", message: "Failed to save statistics." };
+  }
+
+  revalidatePath("/", "layout");
+  revalidatePath("/admin", "layout");
+
+  return { status: "success", message: "Homepage statistics saved." };
+}

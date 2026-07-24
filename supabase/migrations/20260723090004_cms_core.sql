@@ -41,7 +41,7 @@ insert into kida_settings (key, value, label, "group") values
   ),
   (
     'impact_stats',
-    '[{"label":"Registered Alumni","value":12500,"suffix":"+"},{"label":"Counties Represented","value":47},{"label":"Scholarships Awarded","value":320,"suffix":"+"},{"label":"Active Chapters","value":18}]',
+    '[{"label":"Registered Alumni","value":12500,"suffix":"+"},{"label":"Counties Represented","value":47},{"label":"Scholarships Awarded","value":320,"suffix":"+"},{"label":"Diaspora Countries","value":18}]',
     'Impact Statistics',
     'homepage'
   );
