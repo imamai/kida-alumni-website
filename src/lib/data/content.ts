@@ -71,6 +71,101 @@ export async function getLatestNews(limit = 3): Promise<NewsItem[]> {
   }
 }
 
+export type NewsListPageItem = NewsItem & { category_name: string | null };
+
+function toPublicListItem(row: {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  type: "news" | "announcement" | "blog";
+  published_at: string | null;
+  cover_media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+  category: { name: string } | { name: string }[] | null;
+}): NewsListPageItem {
+  const cover = Array.isArray(row.cover_media) ? row.cover_media[0] : row.cover_media;
+  const category = Array.isArray(row.category) ? row.category[0] : row.category;
+  return {
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    excerpt: row.excerpt,
+    type: row.type,
+    published_at: row.published_at,
+    cover_media: cover ?? null,
+    category_name: category?.name ?? null,
+  };
+}
+
+export async function getPublishedNews({
+  type,
+  page = 1,
+  pageSize = 9,
+}: {
+  type?: "news" | "announcement" | "blog";
+  page?: number;
+  pageSize?: number;
+} = {}): Promise<{ items: NewsListPageItem[]; total: number }> {
+  try {
+    const supabase = await createClient();
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    let query = supabase
+      .from("kida_news")
+      .select(
+        "id, title, slug, excerpt, type, published_at, cover_media:kida_media(url, alt_text), category:kida_news_categories(name)",
+        { count: "exact" },
+      )
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .range(from, to);
+
+    if (type) query = query.eq("type", type);
+
+    const { data, count, error } = await query;
+    if (error) return { items: [], total: 0 };
+
+    return {
+      items: ((data ?? []) as unknown as Parameters<typeof toPublicListItem>[0][]).map(toPublicListItem),
+      total: count ?? 0,
+    };
+  } catch {
+    return { items: [], total: 0 };
+  }
+}
+
+export type NewsDetailPageItem = NewsListPageItem & { tags: string[]; content_text: string };
+
+export async function getNewsBySlug(slug: string): Promise<NewsDetailPageItem | null> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("kida_news")
+      .select(
+        "id, title, slug, excerpt, type, published_at, content, tags, cover_media:kida_media(url, alt_text), category:kida_news_categories(name)",
+      )
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    const row = data as unknown as Parameters<typeof toPublicListItem>[0] & {
+      content: { type: string; data: { text?: string } }[];
+      tags: string[];
+    };
+
+    return {
+      ...toPublicListItem(row),
+      tags: row.tags ?? [],
+      content_text: row.content?.[0]?.data?.text ?? "",
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function getUpcomingEvents(limit = 3): Promise<EventItem[]> {
   try {
     const supabase = await createClient();
@@ -86,6 +181,95 @@ export async function getUpcomingEvents(limit = 3): Promise<EventItem[]> {
     return (data ?? []) as unknown as EventItem[];
   } catch {
     return [];
+  }
+}
+
+const EVENT_LIST_COLUMNS =
+  "id, title, slug, category, location_name, is_virtual, start_at, end_at, cover_media:kida_media(url, alt_text)";
+
+export async function getPublishedEvents({
+  when = "upcoming",
+  page = 1,
+  pageSize = 9,
+}: {
+  when?: "upcoming" | "past";
+  page?: number;
+  pageSize?: number;
+} = {}): Promise<{ items: EventItem[]; total: number }> {
+  try {
+    const supabase = await createClient();
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    const now = new Date().toISOString();
+
+    let query = supabase
+      .from("kida_events")
+      .select(EVENT_LIST_COLUMNS, { count: "exact" })
+      .eq("status", "published")
+      .range(from, to);
+
+    query =
+      when === "upcoming"
+        ? query.gte("start_at", now).order("start_at", { ascending: true })
+        : query.lt("start_at", now).order("start_at", { ascending: false });
+
+    const { data, count, error } = await query;
+    if (error) return { items: [], total: 0 };
+
+    return { items: (data ?? []) as unknown as EventItem[], total: count ?? 0 };
+  } catch {
+    return { items: [], total: 0 };
+  }
+}
+
+export type EventDetailPageItem = EventItem & {
+  description: string | null;
+  content_text: string;
+  address: string | null;
+  county: string | null;
+  country: string | null;
+  virtual_link: string | null;
+  timezone: string;
+  capacity: number | null;
+  requires_registration: boolean;
+  ticket_price: number;
+  currency: string;
+};
+
+export async function getEventBySlug(slug: string): Promise<EventDetailPageItem | null> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("kida_events")
+      .select(
+        `${EVENT_LIST_COLUMNS}, description, content, address, county, country, virtual_link, timezone, capacity, requires_registration, ticket_price, currency`,
+      )
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    const row = data as unknown as EventItem & {
+      description: string | null;
+      content: { type: string; data: { text?: string } }[];
+      address: string | null;
+      county: string | null;
+      country: string | null;
+      virtual_link: string | null;
+      timezone: string;
+      capacity: number | null;
+      requires_registration: boolean;
+      ticket_price: number;
+      currency: string;
+    };
+
+    return {
+      ...row,
+      content_text: row.content?.[0]?.data?.text ?? "",
+    };
+  } catch {
+    return null;
   }
 }
 
