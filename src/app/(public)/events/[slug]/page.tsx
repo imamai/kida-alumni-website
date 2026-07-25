@@ -37,7 +37,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
 
       {event.cover_media?.url && (
         <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl">
-          <Image src={event.cover_media.url} alt={event.cover_media.alt_text ?? ""} fill sizes="100vw" className="object-cover" />
+          <Image src={event.cover_media.url} alt={event.cover_media.alt_text ?? ""} fill priority sizes="100vw" className="object-cover" />
         </div>
       )}
 

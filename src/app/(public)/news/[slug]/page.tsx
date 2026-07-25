@@ -39,7 +39,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
 
       {news.cover_media?.url && (
         <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl">
-          <Image src={news.cover_media.url} alt={news.cover_media.alt_text ?? ""} fill sizes="100vw" className="object-cover" />
+          <Image src={news.cover_media.url} alt={news.cover_media.alt_text ?? ""} fill priority sizes="100vw" className="object-cover" />
         </div>
       )}
 
