@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LogoUploader } from "@/components/admin/logo-uploader";
 import { BrandingSettingsForm } from "@/components/admin/branding-settings-form";
+import { AuthPanelForm } from "@/components/admin/auth-panel-form";
 import { getSiteSettings } from "@/lib/data/settings";
 
 export const metadata: Metadata = { title: "Branding & Settings" };
@@ -35,6 +36,16 @@ export default async function BrandingSettingsPage() {
         </CardHeader>
         <CardContent>
           <BrandingSettingsForm settings={settings} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Sign Up / Login Panel</CardTitle>
+          <CardDescription>The image and quote shown beside the sign up and log in forms.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AuthPanelForm panel={settings.auth_panel} />
         </CardContent>
       </Card>
     </div>

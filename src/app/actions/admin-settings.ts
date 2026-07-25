@@ -199,6 +199,129 @@ export async function updateHeroSettings(
   return { status: "success", message: "Hero section saved." };
 }
 
+const aboutContentSchema = z.object({
+  story: z.string().trim().min(1),
+  vision: z.string().trim().min(1),
+  mission: z.string().trim().min(1),
+  objectives: z.string().trim().min(1),
+});
+
+export async function updateAboutContent(
+  _prevState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  if (!(await isStaff())) {
+    return { status: "error", message: "You don't have permission to do that." };
+  }
+
+  const parsed = aboutContentSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) {
+    return { status: "error", message: "Check the form and try again." };
+  }
+
+  const supabase = await createClient();
+  const user = await getCurrentUser();
+
+  const { error } = await supabase
+    .from("kida_settings")
+    .update({ value: parsed.data, updated_by: user?.id })
+    .eq("key", "about");
+
+  if (error) {
+    return { status: "error", message: "Failed to save About KIDA content." };
+  }
+
+  revalidatePath("/", "layout");
+  revalidatePath("/admin", "layout");
+
+  return { status: "success", message: "About KIDA content saved." };
+}
+
+const ALLOWED_AUTH_PANEL_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const MAX_AUTH_PANEL_IMAGE_BYTES = 8 * 1024 * 1024;
+
+const authPanelSchema = z.object({
+  quote: z.string().trim().min(1),
+  quote_author: z.string().trim().min(1),
+});
+
+export async function updateAuthPanel(
+  _prevState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  if (!(await isStaff())) {
+    return { status: "error", message: "You don't have permission to do that." };
+  }
+
+  const parsed = authPanelSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) {
+    return { status: "error", message: "Check the form and try again." };
+  }
+
+  const supabase = await createClient();
+  const user = await getCurrentUser();
+
+  let imageUrl: string | undefined;
+  const file = formData.get("panel_image");
+  if (file instanceof File && file.size > 0) {
+    if (!ALLOWED_AUTH_PANEL_IMAGE_TYPES.includes(file.type)) {
+      return { status: "error", message: "Panel image must be a PNG, JPEG, or WebP image." };
+    }
+    if (file.size > MAX_AUTH_PANEL_IMAGE_BYTES) {
+      return { status: "error", message: "Panel image must be smaller than 8MB." };
+    }
+
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `auth-panel/background-${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage.from("kida-media").upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+    if (uploadError) {
+      return { status: "error", message: "Panel image upload failed." };
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("kida-media").getPublicUrl(path);
+
+    await supabase.from("kida_media").insert({
+      storage_path: path,
+      url: publicUrl,
+      type: "image",
+      mime_type: file.type,
+      size_bytes: file.size,
+      folder: "auth-panel",
+      uploaded_by: user?.id,
+    });
+
+    imageUrl = publicUrl;
+  }
+
+  const { data: existing } = await supabase.from("kida_settings").select("value").eq("key", "auth_panel").maybeSingle();
+  const existingPanel = (existing?.value ?? {}) as Partial<{ image_url: string }>;
+
+  const { error } = await supabase
+    .from("kida_settings")
+    .update({
+      value: { ...parsed.data, image_url: imageUrl ?? existingPanel.image_url },
+      updated_by: user?.id,
+    })
+    .eq("key", "auth_panel");
+
+  if (error) {
+    return { status: "error", message: "Failed to save the sign up / login panel." };
+  }
+
+  revalidatePath("/", "layout");
+  revalidatePath("/admin", "layout");
+  revalidatePath("/login");
+  revalidatePath("/signup");
+
+  return { status: "success", message: "Sign up / login panel saved." };
+}
+
 const impactStatSchema = z.object({
   label: z.string().trim().min(1),
   value: z.coerce.number().int().min(0),

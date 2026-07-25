@@ -16,16 +16,20 @@ import {
   getFeaturedTestimonials,
   getActivePartners,
   getFeaturedAlumni,
+  getGalleryPreview,
+  getTimelineMilestones,
 } from "@/lib/data/content";
 
 export default async function HomePage() {
-  const [settings, news, events, testimonials, partners, alumni] = await Promise.all([
+  const [settings, news, events, testimonials, partners, alumni, galleryPhotos, milestones] = await Promise.all([
     getSiteSettings(),
     getLatestNews(3),
     getUpcomingEvents(3),
     getFeaturedTestimonials(6),
     getActivePartners(),
     getFeaturedAlumni(4),
+    getGalleryPreview(6),
+    getTimelineMilestones(),
   ]);
 
   return (
@@ -36,8 +40,8 @@ export default async function HomePage() {
       <LatestNews items={news} />
       <UpcomingEvents events={events} />
       <CtaBanner />
-      <Timeline />
-      <GalleryPreview />
+      <Timeline milestones={milestones} />
+      <GalleryPreview photos={galleryPhotos} />
       <Testimonials testimonials={testimonials} />
       <PartnersStrip partners={partners} />
       <NewsletterSection />

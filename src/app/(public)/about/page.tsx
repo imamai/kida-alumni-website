@@ -4,28 +4,21 @@ import { GraduationCap, Target, Compass, ListChecks } from "lucide-react";
 import { PageHeader } from "@/components/site/page-header";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Timeline } from "@/components/home/timeline";
+import { getTimelineMilestones } from "@/lib/data/content";
+import { getSiteSettings } from "@/lib/data/settings";
 
 export const metadata: Metadata = { title: "About KIDA" };
 
-const pillars = [
-  {
-    icon: Compass,
-    title: "Vision",
-    copy: "To be the leading alumni association in Kenya, empowering Kibabiians to achieve excellence and give back to their community.",
-  },
-  {
-    icon: Target,
-    title: "Mission",
-    copy: "To connect, develop, and mobilize Kibabii High School alumni for lifelong networking, mentorship, and the sustained growth of our alma mater.",
-  },
-  {
-    icon: ListChecks,
-    title: "Objectives",
-    copy: "Strengthen alumni networks, support scholarships and school infrastructure, promote mentorship, and champion the achievements of Kibabiians everywhere.",
-  },
-];
+export default async function AboutPage() {
+  const [milestones, settings] = await Promise.all([getTimelineMilestones(), getSiteSettings()]);
+  const { about } = settings;
 
-export default function AboutPage() {
+  const pillars = [
+    { icon: Compass, title: "Vision", copy: about.vision },
+    { icon: Target, title: "Mission", copy: about.mission },
+    { icon: ListChecks, title: "Objectives", copy: about.objectives },
+  ];
+
   return (
     <>
       <PageHeader
@@ -41,12 +34,7 @@ export default function AboutPage() {
           </div>
           <div>
             <h2 className="font-heading text-2xl font-semibold">Our Story</h2>
-            <p className="mt-3 text-muted-foreground text-pretty">
-              Since 1998, KIDA has united generations of Kibabii High School graduates under one banner —
-              &ldquo;Advancing our Prosperity.&rdquo; What began as informal reunions among former students has grown
-              into a structured association with county chapters, a diaspora network, scholarship programmes, and a
-              growing digital community connecting Kibabiians across the world.
-            </p>
+            <p className="mt-3 whitespace-pre-wrap text-muted-foreground text-pretty">{about.story}</p>
           </div>
         </div>
 
@@ -55,13 +43,13 @@ export default function AboutPage() {
             <div key={pillar.title} className="rounded-2xl border border-border bg-card p-6">
               <pillar.icon className="size-6 text-kida-gold" />
               <h3 className="mt-4 font-heading text-lg font-semibold">{pillar.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground text-pretty">{pillar.copy}</p>
+              <p className="mt-2 text-sm whitespace-pre-wrap text-muted-foreground text-pretty">{pillar.copy}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <Timeline />
+      <Timeline milestones={milestones} />
 
       <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
         <SectionHeading

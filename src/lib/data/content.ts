@@ -295,6 +295,47 @@ export async function getFeaturedAlumni(limit = 4): Promise<FeaturedAlumniItem[]
   }
 }
 
+export type TimelineMilestone = {
+  id: string;
+  year: string;
+  title: string;
+  description: string;
+};
+
+export async function getTimelineMilestones(): Promise<TimelineMilestone[]> {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("kida_timeline_milestones")
+      .select("id, year, title, description")
+      .eq("status", "active")
+      .order("sort_order", { ascending: true });
+    return data ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export type HallOfFameItem = FeaturedAlumniItem & {
+  bio: string | null;
+  linkedin_url: string | null;
+  website_url: string | null;
+};
+
+export async function getHallOfFame(): Promise<HallOfFameItem[]> {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("kida_featured_alumni")
+      .select("id, full_name, role_title, bio, linkedin_url, website_url, photo:kida_media(url, alt_text)")
+      .eq("status", "active")
+      .order("sort_order", { ascending: true });
+    return (data ?? []) as unknown as HallOfFameItem[];
+  } catch {
+    return [];
+  }
+}
+
 export async function getFeaturedTestimonials(limit = 6): Promise<Testimonial[]> {
   try {
     const supabase = await createClient();
@@ -319,6 +360,147 @@ export async function getActivePartners(): Promise<Partner[]> {
       .eq("status", "active")
       .order("sort_order", { ascending: true });
     return (data ?? []) as unknown as Partner[];
+  } catch {
+    return [];
+  }
+}
+
+export type GalleryAlbumSummary = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  cover_media: { url: string; alt_text: string | null } | null;
+  item_count: number;
+};
+
+export async function getPublishedAlbums({
+  page = 1,
+  pageSize = 12,
+}: { page?: number; pageSize?: number } = {}): Promise<{ items: GalleryAlbumSummary[]; total: number }> {
+  try {
+    const supabase = await createClient();
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const { data, count, error } = await supabase
+      .from("kida_gallery_albums")
+      .select(
+        "id, title, slug, description, cover_media:kida_media(url, alt_text), items:kida_gallery_items(count)",
+        { count: "exact" },
+      )
+      .eq("status", "published")
+      .order("sort_order", { ascending: true })
+      .range(from, to);
+
+    if (error) return { items: [], total: 0 };
+
+    const items = (
+      data as unknown as {
+        id: string;
+        title: string;
+        slug: string;
+        description: string | null;
+        cover_media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+        items: { count: number }[];
+      }[]
+    ).map((row) => ({
+      id: row.id,
+      title: row.title,
+      slug: row.slug,
+      description: row.description,
+      cover_media: Array.isArray(row.cover_media) ? (row.cover_media[0] ?? null) : row.cover_media,
+      item_count: row.items?.[0]?.count ?? 0,
+    }));
+
+    return { items, total: count ?? 0 };
+  } catch {
+    return { items: [], total: 0 };
+  }
+}
+
+export type GalleryPhoto = {
+  id: string;
+  caption: string | null;
+  url: string;
+  alt_text: string | null;
+};
+
+export type GalleryAlbumWithPhotos = GalleryAlbumSummary & { photos: GalleryPhoto[] };
+
+export async function getAlbumBySlug(slug: string): Promise<GalleryAlbumWithPhotos | null> {
+  try {
+    const supabase = await createClient();
+    const { data: album, error } = await supabase
+      .from("kida_gallery_albums")
+      .select("id, title, slug, description, cover_media:kida_media(url, alt_text)")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle();
+
+    if (error || !album) return null;
+
+    const { data: items } = await supabase
+      .from("kida_gallery_items")
+      .select("id, caption, media:kida_media(url, alt_text)")
+      .eq("album_id", (album as { id: string }).id)
+      .order("sort_order", { ascending: true });
+
+    const row = album as unknown as {
+      id: string;
+      title: string;
+      slug: string;
+      description: string | null;
+      cover_media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+    };
+
+    const photos = (
+      (items ?? []) as unknown as {
+        id: string;
+        caption: string | null;
+        media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+      }[]
+    ).map((item) => {
+      const media = Array.isArray(item.media) ? item.media[0] : item.media;
+      return { id: item.id, caption: item.caption, url: media?.url ?? "", alt_text: media?.alt_text ?? null };
+    });
+
+    return {
+      id: row.id,
+      title: row.title,
+      slug: row.slug,
+      description: row.description,
+      cover_media: Array.isArray(row.cover_media) ? (row.cover_media[0] ?? null) : row.cover_media,
+      item_count: photos.length,
+      photos,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function getGalleryPreview(limit = 6): Promise<GalleryPhoto[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("kida_gallery_items")
+      .select("id, caption, media:kida_media(url, alt_text), album:kida_gallery_albums!inner(status)")
+      .eq("album.status", "published")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) return [];
+
+    return (
+      (data ?? []) as unknown as {
+        id: string;
+        caption: string | null;
+        media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+      }[]
+    ).map((item) => {
+      const media = Array.isArray(item.media) ? item.media[0] : item.media;
+      return { id: item.id, caption: item.caption, url: media?.url ?? "", alt_text: media?.alt_text ?? null };
+    });
   } catch {
     return [];
   }

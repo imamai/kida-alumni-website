@@ -1,16 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
-
-const PANEL_IMAGE =
-  "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop";
+import type { AuthPanelSettings } from "@/lib/data/settings";
 
 export function AuthShell({
   title,
   subtitle,
+  panel,
   children,
 }: {
   title: string;
   subtitle: string;
+  panel: AuthPanelSettings;
   children: React.ReactNode;
 }) {
   return (
@@ -26,14 +26,11 @@ export function AuthShell({
         </div>
       </div>
       <div className="relative hidden overflow-hidden bg-kida-charcoal lg:block">
-        <Image src={PANEL_IMAGE} alt="" fill sizes="50vw" className="object-cover opacity-50" />
+        <Image src={panel.image_url} alt="" fill sizes="50vw" className="object-cover opacity-50" />
         <div className="absolute inset-0 bg-gradient-to-t from-kida-purple/90 via-kida-charcoal/40 to-transparent" />
         <div className="relative flex h-full flex-col justify-end p-12 text-white">
-          <blockquote className="font-heading text-2xl font-medium text-balance">
-            &ldquo;Once a Kibabiian, always a Kibabiian. This platform keeps that bond alive across every county and
-            continent.&rdquo;
-          </blockquote>
-          <p className="mt-4 text-sm text-white/70">— KIDA Executive Committee</p>
+          <blockquote className="font-heading text-2xl font-medium text-balance">&ldquo;{panel.quote}&rdquo;</blockquote>
+          <p className="mt-4 text-sm text-white/70">— {panel.quote_author}</p>
         </div>
       </div>
     </div>

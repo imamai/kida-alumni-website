@@ -26,6 +26,19 @@ export type SocialLinks = {
   youtube?: string;
 };
 
+export type AboutContent = {
+  story: string;
+  vision: string;
+  mission: string;
+  objectives: string;
+};
+
+export type AuthPanelSettings = {
+  image_url: string;
+  quote: string;
+  quote_author: string;
+};
+
 export type SiteSettings = {
   site_name: string;
   site_short_name: string;
@@ -38,6 +51,8 @@ export type SiteSettings = {
   social_links: SocialLinks;
   hero: HeroSettings;
   impact_stats: ImpactStat[];
+  about: AboutContent;
+  auth_panel: AuthPanelSettings;
 };
 
 // Fallbacks mirror the seed data in supabase/migrations/20260723090004_cms_core.sql so the site
@@ -71,6 +86,22 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     { label: "Scholarships Awarded", value: 320, suffix: "+" },
     { label: "Diaspora Countries", value: 18 },
   ],
+  about: {
+    story:
+      "Since 1998, KIDA has united generations of Kibabii High School graduates under one banner — “Advancing our Prosperity.” What began as informal reunions among former students has grown into a structured association with county chapters, a diaspora network, scholarship programmes, and a growing digital community connecting Kibabiians across the world.",
+    vision:
+      "To be the leading alumni association in Kenya, empowering Kibabiians to achieve excellence and give back to their community.",
+    mission:
+      "To connect, develop, and mobilize Kibabii High School alumni for lifelong networking, mentorship, and the sustained growth of our alma mater.",
+    objectives:
+      "Strengthen alumni networks, support scholarships and school infrastructure, promote mentorship, and champion the achievements of Kibabiians everywhere.",
+  },
+  auth_panel: {
+    image_url: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop",
+    quote:
+      "Once a Kibabiian, always a Kibabiian. This platform keeps that bond alive across every county and continent.",
+    quote_author: "KIDA Executive Committee",
+  },
 };
 
 /**
