@@ -10,22 +10,29 @@ import { Testimonials } from "@/components/home/testimonials";
 import { PartnersStrip } from "@/components/home/partners-strip";
 import { NewsletterSection } from "@/components/home/newsletter-section";
 import { getSiteSettings } from "@/lib/data/settings";
-import { getLatestNews, getUpcomingEvents, getFeaturedTestimonials, getActivePartners } from "@/lib/data/content";
+import {
+  getLatestNews,
+  getUpcomingEvents,
+  getFeaturedTestimonials,
+  getActivePartners,
+  getFeaturedAlumni,
+} from "@/lib/data/content";
 
 export default async function HomePage() {
-  const [settings, news, events, testimonials, partners] = await Promise.all([
+  const [settings, news, events, testimonials, partners, alumni] = await Promise.all([
     getSiteSettings(),
     getLatestNews(3),
     getUpcomingEvents(3),
     getFeaturedTestimonials(6),
     getActivePartners(),
+    getFeaturedAlumni(4),
   ]);
 
   return (
     <>
       <Hero hero={settings.hero} />
       <ImpactStats stats={settings.impact_stats} />
-      <FeaturedAlumni />
+      <FeaturedAlumni alumni={alumni} />
       <LatestNews items={news} />
       <UpcomingEvents events={events} />
       <CtaBanner />

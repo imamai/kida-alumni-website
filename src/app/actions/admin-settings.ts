@@ -107,6 +107,98 @@ export async function updateBrandingSettings(
   return { status: "success", message: "Branding settings saved." };
 }
 
+const ALLOWED_HERO_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const MAX_HERO_IMAGE_BYTES = 8 * 1024 * 1024;
+
+const heroSchema = z.object({
+  eyebrow: z.string().trim().min(1),
+  headline: z.string().trim().min(1),
+  subheadline: z.string().trim().min(1),
+  primary_cta_label: z.string().trim().min(1),
+  primary_cta_href: z.string().trim().min(1),
+  secondary_cta_label: z.string().trim().min(1),
+  secondary_cta_href: z.string().trim().min(1),
+});
+
+export async function updateHeroSettings(
+  _prevState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  if (!(await isStaff())) {
+    return { status: "error", message: "You don't have permission to do that." };
+  }
+
+  const parsed = heroSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) {
+    return { status: "error", message: "Check the form and try again." };
+  }
+
+  const supabase = await createClient();
+  const user = await getCurrentUser();
+
+  let mediaUrl: string | undefined;
+  const file = formData.get("hero_image");
+  if (file instanceof File && file.size > 0) {
+    if (!ALLOWED_HERO_IMAGE_TYPES.includes(file.type)) {
+      return { status: "error", message: "Hero image must be a PNG, JPEG, or WebP image." };
+    }
+    if (file.size > MAX_HERO_IMAGE_BYTES) {
+      return { status: "error", message: "Hero image must be smaller than 8MB." };
+    }
+
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `hero/background-${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage.from("kida-media").upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+    if (uploadError) {
+      return { status: "error", message: "Hero image upload failed." };
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("kida-media").getPublicUrl(path);
+
+    await supabase.from("kida_media").insert({
+      storage_path: path,
+      url: publicUrl,
+      type: "image",
+      mime_type: file.type,
+      size_bytes: file.size,
+      folder: "hero",
+      uploaded_by: user?.id,
+    });
+
+    mediaUrl = publicUrl;
+  }
+
+  const { data: existing } = await supabase.from("kida_settings").select("value").eq("key", "hero").maybeSingle();
+  const existingHero = (existing?.value ?? {}) as Partial<{ media_type: string; media_url: string }>;
+
+  const { error } = await supabase
+    .from("kida_settings")
+    .update({
+      value: {
+        ...parsed.data,
+        media_type: existingHero.media_type ?? "image",
+        media_url: mediaUrl ?? existingHero.media_url,
+      },
+      updated_by: user?.id,
+    })
+    .eq("key", "hero");
+
+  if (error) {
+    return { status: "error", message: "Failed to save hero section." };
+  }
+
+  revalidatePath("/", "layout");
+  revalidatePath("/admin", "layout");
+
+  return { status: "success", message: "Hero section saved." };
+}
+
 const impactStatSchema = z.object({
   label: z.string().trim().min(1),
   value: z.coerce.number().int().min(0),

@@ -273,6 +273,28 @@ export async function getEventBySlug(slug: string): Promise<EventDetailPageItem 
   }
 }
 
+export type FeaturedAlumniItem = {
+  id: string;
+  full_name: string;
+  role_title: string;
+  photo: { url: string; alt_text: string | null } | null;
+};
+
+export async function getFeaturedAlumni(limit = 4): Promise<FeaturedAlumniItem[]> {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("kida_featured_alumni")
+      .select("id, full_name, role_title, photo:kida_media(url, alt_text)")
+      .eq("status", "active")
+      .order("sort_order", { ascending: true })
+      .limit(limit);
+    return (data ?? []) as unknown as FeaturedAlumniItem[];
+  } catch {
+    return [];
+  }
+}
+
 export async function getFeaturedTestimonials(limit = 6): Promise<Testimonial[]> {
   try {
     const supabase = await createClient();
