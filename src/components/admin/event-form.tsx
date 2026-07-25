@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createEvent, updateEvent, type EventActionState } from "@/app/actions/admin-events";
 import { slugify } from "@/lib/slug";
-import { EVENT_CATEGORIES, type EventDetail } from "@/lib/data/admin-events";
+import { EVENT_CATEGORIES } from "@/lib/event-categories";
+import type { EventDetail } from "@/lib/data/admin-events";
 
 const initialState: EventActionState = { status: "idle" };
 

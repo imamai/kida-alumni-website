@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { PageHeader } from "@/components/site/page-header";
+import { RichText } from "@/components/site/rich-text";
 import { getHallOfFame } from "@/lib/data/content";
 
 export const metadata: Metadata = { title: "Hall of Fame" };
@@ -40,7 +41,7 @@ export default async function HallOfFamePage() {
                 <div className="p-5">
                   <h3 className="font-heading text-lg font-medium">{alum.full_name}</h3>
                   <p className="mt-0.5 text-xs text-kida-maroon">{alum.role_title}</p>
-                  {alum.bio && <p className="mt-3 text-sm whitespace-pre-wrap text-muted-foreground">{alum.bio}</p>}
+                  {alum.bio && <RichText text={alum.bio} className="mt-3 text-sm text-muted-foreground" />}
                   {(alum.linkedin_url || alum.website_url) && (
                     <div className="mt-3 flex gap-4 text-sm">
                       {alum.linkedin_url && (

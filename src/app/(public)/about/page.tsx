@@ -3,6 +3,7 @@ import Link from "next/link";
 import { GraduationCap, Target, Compass, ListChecks } from "lucide-react";
 import { PageHeader } from "@/components/site/page-header";
 import { SectionHeading } from "@/components/site/section-heading";
+import { RichText } from "@/components/site/rich-text";
 import { Timeline } from "@/components/home/timeline";
 import { getTimelineMilestones } from "@/lib/data/content";
 import { getSiteSettings } from "@/lib/data/settings";
@@ -34,7 +35,7 @@ export default async function AboutPage() {
           </div>
           <div>
             <h2 className="font-heading text-2xl font-semibold">Our Story</h2>
-            <p className="mt-3 whitespace-pre-wrap text-muted-foreground text-pretty">{about.story}</p>
+            <RichText text={about.story} className="mt-3 text-muted-foreground text-pretty" />
           </div>
         </div>
 
@@ -43,7 +44,7 @@ export default async function AboutPage() {
             <div key={pillar.title} className="rounded-2xl border border-border bg-card p-6">
               <pillar.icon className="size-6 text-kida-gold" />
               <h3 className="mt-4 font-heading text-lg font-semibold">{pillar.title}</h3>
-              <p className="mt-2 text-sm whitespace-pre-wrap text-muted-foreground text-pretty">{pillar.copy}</p>
+              <RichText text={pillar.copy} className="mt-2 text-sm text-muted-foreground text-pretty" />
             </div>
           ))}
         </div>

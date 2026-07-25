@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { RichText } from "@/components/site/rich-text";
 import { getNewsBySlug } from "@/lib/data/content";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -43,7 +44,9 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
         </div>
       )}
 
-      <div className="mt-8 space-y-4 text-base whitespace-pre-wrap text-foreground">{news.content_text}</div>
+      <div className="mt-8 space-y-4 text-base text-foreground">
+        <RichText text={news.content_text} />
+      </div>
 
       {news.tags.length > 0 && (
         <div className="mt-8 flex flex-wrap gap-1.5 border-t border-border pt-6">

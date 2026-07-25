@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { ArrowLeft, CalendarDays, MapPin, Video, Users, Ticket } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { RichText } from "@/components/site/rich-text";
 import { getEventBySlug } from "@/lib/data/content";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -103,7 +104,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
         )}
       </div>
 
-      {event.content_text && <div className="mt-8 space-y-4 text-base whitespace-pre-wrap text-foreground">{event.content_text}</div>}
+      {event.content_text && (
+        <div className="mt-8 space-y-4 text-base text-foreground">
+          <RichText text={event.content_text} />
+        </div>
+      )}
 
       {event.requires_registration && (
         <div className="mt-8 rounded-2xl border border-kida-purple/20 bg-kida-purple/5 p-6 text-center">

@@ -63,6 +63,7 @@ export async function getLatestNews(limit = 3): Promise<NewsItem[]> {
       .from("kida_news")
       .select("id, title, slug, excerpt, type, published_at, cover_media:kida_media(url, alt_text)")
       .eq("status", "published")
+      .is("deleted_at", null)
       .order("published_at", { ascending: false })
       .limit(limit);
     return (data ?? []) as unknown as NewsItem[];
@@ -118,6 +119,7 @@ export async function getPublishedNews({
         { count: "exact" },
       )
       .eq("status", "published")
+      .is("deleted_at", null)
       .order("published_at", { ascending: false })
       .range(from, to);
 
@@ -147,6 +149,7 @@ export async function getNewsBySlug(slug: string): Promise<NewsDetailPageItem | 
       )
       .eq("slug", slug)
       .eq("status", "published")
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (error || !data) return null;
@@ -175,6 +178,7 @@ export async function getUpcomingEvents(limit = 3): Promise<EventItem[]> {
         "id, title, slug, category, location_name, is_virtual, start_at, end_at, cover_media:kida_media(url, alt_text)",
       )
       .eq("status", "published")
+      .is("deleted_at", null)
       .gte("start_at", new Date().toISOString())
       .order("start_at", { ascending: true })
       .limit(limit);
@@ -206,6 +210,7 @@ export async function getPublishedEvents({
       .from("kida_events")
       .select(EVENT_LIST_COLUMNS, { count: "exact" })
       .eq("status", "published")
+      .is("deleted_at", null)
       .range(from, to);
 
     query =
@@ -246,6 +251,7 @@ export async function getEventBySlug(slug: string): Promise<EventDetailPageItem 
       )
       .eq("slug", slug)
       .eq("status", "published")
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (error || !data) return null;
@@ -287,6 +293,7 @@ export async function getFeaturedAlumni(limit = 4): Promise<FeaturedAlumniItem[]
       .from("kida_featured_alumni")
       .select("id, full_name, role_title, photo:kida_media(url, alt_text)")
       .eq("status", "active")
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true })
       .limit(limit);
     return (data ?? []) as unknown as FeaturedAlumniItem[];
@@ -309,6 +316,7 @@ export async function getTimelineMilestones(): Promise<TimelineMilestone[]> {
       .from("kida_timeline_milestones")
       .select("id, year, title, description")
       .eq("status", "active")
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true });
     return data ?? [];
   } catch {
@@ -329,6 +337,7 @@ export async function getHallOfFame(): Promise<HallOfFameItem[]> {
       .from("kida_featured_alumni")
       .select("id, full_name, role_title, bio, linkedin_url, website_url, photo:kida_media(url, alt_text)")
       .eq("status", "active")
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true });
     return (data ?? []) as unknown as HallOfFameItem[];
   } catch {
@@ -343,6 +352,7 @@ export async function getFeaturedTestimonials(limit = 6): Promise<Testimonial[]>
       .from("kida_testimonials")
       .select("id, author_name, author_title, quote, author_photo:kida_media(url, alt_text)")
       .eq("status", "published")
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true })
       .limit(limit);
     return (data ?? []) as unknown as Testimonial[];
@@ -358,6 +368,7 @@ export async function getActivePartners(): Promise<Partner[]> {
       .from("kida_partners")
       .select("id, name, website_url, tier, logo:kida_media(url, alt_text)")
       .eq("status", "active")
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true });
     return (data ?? []) as unknown as Partner[];
   } catch {
@@ -390,6 +401,7 @@ export async function getPublishedAlbums({
         { count: "exact" },
       )
       .eq("status", "published")
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true })
       .range(from, to);
 
@@ -436,6 +448,7 @@ export async function getAlbumBySlug(slug: string): Promise<GalleryAlbumWithPhot
       .select("id, title, slug, description, cover_media:kida_media(url, alt_text)")
       .eq("slug", slug)
       .eq("status", "published")
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (error || !album) return null;
@@ -486,6 +499,7 @@ export async function getGalleryPreview(limit = 6): Promise<GalleryPhoto[]> {
       .from("kida_gallery_items")
       .select("id, caption, media:kida_media(url, alt_text), album:kida_gallery_albums!inner(status)")
       .eq("album.status", "published")
+      .is("album.deleted_at", null)
       .order("created_at", { ascending: false })
       .limit(limit);
 
@@ -513,6 +527,7 @@ export async function getLeadership(category?: "executive" | "patron" | "committ
       .from("kida_leadership")
       .select("id, full_name, title, category, bio, photo:kida_media(url, alt_text)")
       .eq("status", "active")
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true });
     if (category) query = query.eq("category", category);
     const { data } = await query;
@@ -529,6 +544,7 @@ export async function getFaqs(category?: string): Promise<Faq[]> {
       .from("kida_faqs")
       .select("id, question, answer, category")
       .eq("status", "published")
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true });
     if (category) query = query.eq("category", category);
     const { data } = await query;

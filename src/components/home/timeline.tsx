@@ -1,5 +1,6 @@
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/site/section-heading";
+import { RichText } from "@/components/site/rich-text";
 import type { TimelineMilestone } from "@/lib/data/content";
 
 export function Timeline({ milestones }: { milestones: TimelineMilestone[] }) {
@@ -19,7 +20,7 @@ export function Timeline({ milestones }: { milestones: TimelineMilestone[] }) {
                   <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
                     <span className="font-heading text-lg font-semibold text-kida-purple">{m.year}</span>
                     <h3 className="mt-1 font-medium">{m.title}</h3>
-                    <p className="mt-1 text-sm whitespace-pre-wrap text-muted-foreground">{m.description}</p>
+                    <RichText text={m.description} className="mt-1 text-sm text-muted-foreground" />
                   </div>
                 </Reveal>
               </li>

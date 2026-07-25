@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/site/page-header";
+import { RichText } from "@/components/site/rich-text";
 import { Timeline } from "@/components/home/timeline";
 import { getTimelineMilestones } from "@/lib/data/content";
 import { getSiteSettings } from "@/lib/data/settings";
@@ -13,7 +14,7 @@ export default async function HistoryPage() {
     <>
       <PageHeader eyebrow="Our Journey" title="Our History" description="From a single high school to a global alumni network." />
       <div className="mx-auto max-w-3xl px-4 pt-16 sm:px-6 lg:px-8">
-        <p className="whitespace-pre-wrap text-muted-foreground text-pretty">{settings.about.story}</p>
+        <RichText text={settings.about.story} className="text-muted-foreground text-pretty" />
       </div>
       <Timeline milestones={milestones} />
     </>
