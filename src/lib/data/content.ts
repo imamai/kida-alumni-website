@@ -44,6 +44,11 @@ export type LeadershipMember = {
   title: string;
   category: "executive" | "patron" | "committee";
   bio: string | null;
+  county: string | null;
+  linkedin_url: string | null;
+  email: string | null;
+  term_start: string | null;
+  term_end: string | null;
   photo: { url: string; alt_text: string | null } | null;
 };
 
@@ -525,7 +530,9 @@ export async function getLeadership(category?: "executive" | "patron" | "committ
     const supabase = await createClient();
     let query = supabase
       .from("kida_leadership")
-      .select("id, full_name, title, category, bio, photo:kida_media(url, alt_text)")
+      .select(
+        "id, full_name, title, category, bio, county, linkedin_url, email, term_start, term_end, photo:kida_media(url, alt_text)",
+      )
       .eq("status", "active")
       .is("deleted_at", null)
       .order("sort_order", { ascending: true });

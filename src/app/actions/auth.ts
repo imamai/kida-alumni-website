@@ -63,7 +63,7 @@ export async function signUpWithPassword(_prevState: AuthState, formData: FormDa
 
   const origin = (await headers()).get("origin");
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
@@ -77,7 +77,21 @@ export async function signUpWithPassword(_prevState: AuthState, formData: FormDa
   });
 
   if (error) {
-    return { status: "error", message: error.message };
+    const alreadyRegistered = /already registered|already exists/i.test(error.message);
+    return {
+      status: "error",
+      message: alreadyRegistered
+        ? "An account with this email already exists. Try signing in instead."
+        : error.message,
+    };
+  }
+
+  // Supabase silently no-ops signUp for an email that's already registered (no error, no new
+  // user, no email sent) to avoid leaking which emails have accounts — detectable only by an
+  // empty identities array on the returned user. Without this check we'd show a false "check
+  // your email" success message for what is actually a duplicate registration attempt.
+  if (data.user && data.user.identities && data.user.identities.length === 0) {
+    return { status: "error", message: "An account with this email already exists. Try signing in instead." };
   }
 
   return {
