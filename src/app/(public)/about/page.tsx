@@ -38,7 +38,7 @@ export default async function AboutPage() {
           </div>
         </div>
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-3">
+        <div id="vision-mission" className="mt-14 grid scroll-mt-24 gap-6 sm:grid-cols-3">
           {pillars.map((pillar) => (
             <div key={pillar.title} className="rounded-2xl border border-border bg-card p-6">
               <pillar.icon className="size-6 text-kida-gold" />
