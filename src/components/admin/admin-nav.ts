@@ -28,6 +28,6 @@ export const adminNav: AdminNavItem[] = [
   { label: "Members", href: "/admin/members", icon: Users },
   { label: "News & Announcements", href: "/admin/news", icon: Newspaper },
   { label: "Events", href: "/admin/events", icon: CalendarDays },
-  { label: "Media Library", href: "/admin/media", icon: ImageIcon, disabled: true },
+  { label: "Media Library", href: "/admin/media", icon: ImageIcon },
   { label: "Roles & Permissions", href: "/admin/roles", icon: UserCog, disabled: true },
 ];
