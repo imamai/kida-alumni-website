@@ -537,3 +537,31 @@ export async function getFaqs(category?: string): Promise<Faq[]> {
     return [];
   }
 }
+
+export type PublicDocument = {
+  id: string;
+  url: string;
+  caption: string | null;
+  size_bytes: number | null;
+  folder: string;
+  created_at: string;
+};
+
+/** Documents uploaded via the Media Library (type = 'document'), used by /downloads and governance links. */
+export async function getDocuments(folder?: string): Promise<PublicDocument[]> {
+  try {
+    const supabase = await createClient();
+    let query = supabase
+      .from("kida_media")
+      .select("id, url, caption, size_bytes, folder, created_at")
+      .eq("type", "document")
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
+    if (folder) query = query.eq("folder", folder);
+    const { data, error } = await query;
+    if (error) return [];
+    return data ?? [];
+  } catch {
+    return [];
+  }
+}
