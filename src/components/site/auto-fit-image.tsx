@@ -41,8 +41,8 @@ export function AutoFitImage({
 
 /**
  * Fixed-ratio frame for grids where every card must be the same size (uniform rows). The photo
- * is scaled to fit fully inside the frame (never cropped) with the frame background showing
- * around it, rather than each card growing to its own photo's aspect ratio like AutoFitImage.
+ * is stretched to fill the frame edge-to-edge — no empty margins, no crop — at the cost of some
+ * distortion when a photo's own ratio is far from the frame's ratio.
  */
 export function FramedImage({
   media,
@@ -62,14 +62,14 @@ export function FramedImage({
   priority?: boolean;
 }) {
   return (
-    <div className="relative w-full overflow-hidden bg-muted/40" style={{ aspectRatio: aspect }}>
+    <div className="relative w-full overflow-hidden" style={{ aspectRatio: aspect }}>
       <Image
         src={media?.url ?? fallbackUrl}
         alt={media?.alt_text ?? alt}
         fill
         sizes={sizes}
         priority={priority}
-        className={cn("object-contain", className)}
+        className={cn("object-fill", className)}
       />
     </div>
   );
