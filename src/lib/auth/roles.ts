@@ -13,6 +13,18 @@ export async function isStaff(): Promise<boolean> {
   }
 }
 
+/** Top-tier only: Super Admin or Administrator. Required for role/permission management. */
+export async function isAdmin(): Promise<boolean> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("kida_is_admin");
+    if (error) return false;
+    return Boolean(data);
+  } catch {
+    return false;
+  }
+}
+
 export async function getCurrentUser() {
   const supabase = await createClient();
   const {

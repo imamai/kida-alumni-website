@@ -33,5 +33,5 @@ export const adminNav: AdminNavItem[] = [
   { label: "Events", href: "/admin/events", icon: CalendarDays },
   { label: "Media Library", href: "/admin/media", icon: ImageIcon },
   { label: "Gallery", href: "/admin/gallery", icon: Images },
-  { label: "Roles & Permissions", href: "/admin/roles", icon: UserCog, disabled: true },
+  { label: "Roles & Permissions", href: "/admin/roles", icon: UserCog },
 ];

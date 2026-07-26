@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { LogoUploader } from "@/components/admin/logo-uploader";
 import { BrandingSettingsForm } from "@/components/admin/branding-settings-form";
 import { AuthPanelForm } from "@/components/admin/auth-panel-form";
+import { SocialLinksForm } from "@/components/admin/social-links-form";
 import { getSiteSettings } from "@/lib/data/settings";
 
 export const metadata: Metadata = { title: "Branding & Settings" };
@@ -36,6 +37,16 @@ export default async function BrandingSettingsPage() {
         </CardHeader>
         <CardContent>
           <BrandingSettingsForm settings={settings} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Social Media</CardTitle>
+          <CardDescription>Links shown as icons in the site footer. Facebook, Instagram, X, YouTube, and LinkedIn.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SocialLinksForm links={settings.social_links} />
         </CardContent>
       </Card>
 

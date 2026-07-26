@@ -14,6 +14,16 @@ const socialIcons = {
   youtube: YoutubeIcon,
 } as const;
 
+// Each platform's own brand color, so the footer row reads as recognizable logos rather than a
+// generic icon set.
+const socialBrandClasses: Record<keyof typeof socialIcons, string> = {
+  facebook: "bg-[#1877F2] hover:bg-[#1877F2]/85",
+  twitter: "bg-black hover:bg-black/80",
+  instagram: "bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-85",
+  linkedin: "bg-[#0A66C2] hover:bg-[#0A66C2]/85",
+  youtube: "bg-[#FF0000] hover:bg-[#FF0000]/85",
+};
+
 export function SiteFooter({ settings }: { settings: SiteSettings }) {
   const year = new Date().getFullYear();
   const socialEntries = Object.entries(settings.social_links).filter(([, url]) => url) as [
@@ -59,7 +69,7 @@ export function SiteFooter({ settings }: { settings: SiteSettings }) {
                       target="_blank"
                       rel="noreferrer"
                       aria-label={key}
-                      className="flex size-9 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-kida-gold hover:text-kida-charcoal"
+                      className={`flex size-9 items-center justify-center rounded-full text-white transition-all ${socialBrandClasses[key]}`}
                     >
                       <Icon className="size-4" />
                     </a>

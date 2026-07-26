@@ -111,6 +111,58 @@ export async function updateBrandingSettings(
   return { status: "success", message: "Branding settings saved." };
 }
 
+const urlOrEmpty = z
+  .string()
+  .trim()
+  .optional()
+  .transform((v) => v || "")
+  .refine((v) => v === "" || z.string().url().safeParse(v).success, "Enter a valid URL or leave it blank.");
+
+const socialLinksSchema = z.object({
+  facebook: urlOrEmpty,
+  twitter: urlOrEmpty,
+  instagram: urlOrEmpty,
+  linkedin: urlOrEmpty,
+  youtube: urlOrEmpty,
+});
+
+export async function updateSocialLinks(
+  _prevState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  if (!(await isStaff())) {
+    return { status: "error", message: "You don't have permission to do that." };
+  }
+
+  const parsed = socialLinksSchema.safeParse({
+    facebook: formData.get("facebook"),
+    twitter: formData.get("twitter"),
+    instagram: formData.get("instagram"),
+    linkedin: formData.get("linkedin"),
+    youtube: formData.get("youtube"),
+  });
+  if (!parsed.success) {
+    return { status: "error", message: parsed.error.issues[0]?.message ?? "Check the form and try again." };
+  }
+
+  const supabase = await createClient();
+  const user = await getCurrentUser();
+
+  const { error } = await supabase
+    .from("kida_settings")
+    .update({ value: parsed.data, updated_by: user?.id })
+    .eq("key", "social_links");
+
+  if (error) {
+    return { status: "error", message: "Failed to save social links." };
+  }
+
+  revalidatePath("/", "layout");
+  revalidatePath("/admin", "layout");
+
+  return { status: "success", message: "Social links saved." };
+}
+
 const ALLOWED_HERO_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const MAX_HERO_IMAGE_BYTES = 8 * 1024 * 1024;
 
