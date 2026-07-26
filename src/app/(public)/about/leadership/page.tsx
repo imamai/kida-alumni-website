@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/site/page-header";
 import { RichText } from "@/components/site/rich-text";
-import { AutoFitImage } from "@/components/site/auto-fit-image";
+import { FramedImage } from "@/components/site/auto-fit-image";
 import { getLeadership } from "@/lib/data/content";
 
 export const metadata: Metadata = { title: "Leadership" };
@@ -41,12 +41,11 @@ export default async function LeadershipPage() {
                   {members.map((member) => (
                     <div key={member.id} className="overflow-hidden rounded-2xl border border-border bg-card">
                       <div className="relative">
-                        <AutoFitImage
+                        <FramedImage
                           media={member.photo}
                           alt={member.full_name}
                           fallbackUrl={PLACEHOLDER_PORTRAIT}
-                          fallbackWidth={600}
-                          fallbackHeight={600}
+                          aspect={1}
                           sizes="(min-width: 1024px) 33vw, 50vw"
                         />
                       </div>

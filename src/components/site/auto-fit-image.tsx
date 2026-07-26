@@ -38,3 +38,39 @@ export function AutoFitImage({
     />
   );
 }
+
+/**
+ * Fixed-ratio frame for grids where every card must be the same size (uniform rows). The photo
+ * is scaled to fit fully inside the frame (never cropped) with the frame background showing
+ * around it, rather than each card growing to its own photo's aspect ratio like AutoFitImage.
+ */
+export function FramedImage({
+  media,
+  alt,
+  fallbackUrl,
+  aspect,
+  sizes,
+  className,
+  priority,
+}: {
+  media: MediaRef;
+  alt: string;
+  fallbackUrl: string;
+  aspect: number;
+  sizes: string;
+  className?: string;
+  priority?: boolean;
+}) {
+  return (
+    <div className="relative w-full overflow-hidden bg-muted/40" style={{ aspectRatio: aspect }}>
+      <Image
+        src={media?.url ?? fallbackUrl}
+        alt={media?.alt_text ?? alt}
+        fill
+        sizes={sizes}
+        priority={priority}
+        className={cn("object-contain", className)}
+      />
+    </div>
+  );
+}

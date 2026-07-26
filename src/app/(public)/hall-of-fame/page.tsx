@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/site/page-header";
 import { RichText } from "@/components/site/rich-text";
-import { AutoFitImage } from "@/components/site/auto-fit-image";
+import { FramedImage } from "@/components/site/auto-fit-image";
 import { getHallOfFame } from "@/lib/data/content";
 
 export const metadata: Metadata = { title: "Hall of Fame" };
@@ -29,13 +29,12 @@ export default async function HallOfFamePage() {
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {alumni.map((alum) => (
               <div key={alum.id} className="overflow-hidden rounded-2xl border border-border bg-card">
-                <div className="relative overflow-hidden">
-                  <AutoFitImage
+                <div className="relative">
+                  <FramedImage
                     media={alum.photo}
                     alt={alum.full_name}
                     fallbackUrl={PLACEHOLDER_PHOTO}
-                    fallbackWidth={600}
-                    fallbackHeight={750}
+                    aspect={4 / 5}
                     sizes="(min-width: 1024px) 33vw, 50vw"
                   />
                 </div>

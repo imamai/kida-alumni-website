@@ -5,7 +5,7 @@ import { CalendarDays, MapPin, Video } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/site/page-header";
-import { AutoFitImage } from "@/components/site/auto-fit-image";
+import { FramedImage } from "@/components/site/auto-fit-image";
 import { getPublishedEvents } from "@/lib/data/content";
 import { cn } from "@/lib/utils";
 
@@ -73,13 +73,12 @@ export default async function EventsPage({
                   href={`/events/${event.slug}`}
                   className="group block overflow-hidden rounded-2xl border border-border bg-card"
                 >
-                  <div className="relative overflow-hidden">
-                    <AutoFitImage
+                  <div className="relative">
+                    <FramedImage
                       media={event.cover_media}
                       alt={event.title}
                       fallbackUrl={PLACEHOLDER_IMAGE}
-                      fallbackWidth={1200}
-                      fallbackHeight={750}
+                      aspect={16 / 10}
                       priority={i === 0}
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       className="transition-transform duration-500 group-hover:scale-105"

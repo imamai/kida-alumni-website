@@ -1,7 +1,7 @@
 import { SectionHeading } from "@/components/site/section-heading";
 import { Reveal } from "@/components/ui/reveal";
 import { Badge } from "@/components/ui/badge";
-import { AutoFitImage } from "@/components/site/auto-fit-image";
+import { FramedImage } from "@/components/site/auto-fit-image";
 import type { FeaturedAlumniItem } from "@/lib/data/content";
 
 const PLACEHOLDER_PHOTO =
@@ -21,13 +21,12 @@ export function FeaturedAlumni({ alumni }: { alumni: FeaturedAlumniItem[] }) {
         {alumni.map((alum, i) => (
           <Reveal key={alum.id} delay={i * 0.07}>
             <div className="group overflow-hidden rounded-2xl border border-border bg-card">
-              <div className="relative overflow-hidden">
-                <AutoFitImage
+              <div className="relative">
+                <FramedImage
                   media={alum.photo}
                   alt={alum.full_name}
                   fallbackUrl={PLACEHOLDER_PHOTO}
-                  fallbackWidth={600}
-                  fallbackHeight={750}
+                  aspect={4 / 5}
                   sizes="(min-width: 1024px) 25vw, 50vw"
                   className="transition-transform duration-500 group-hover:scale-105"
                 />
