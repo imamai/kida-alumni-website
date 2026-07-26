@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { isStaff, getCurrentUser } from "@/lib/auth/roles";
+import { getImageDimensions } from "@/lib/media/dimensions";
 
 export type SettingsActionState = { status: "idle" | "success" | "error"; message?: string };
 
@@ -42,6 +43,7 @@ export async function uploadLogo(_prevState: SettingsActionState, formData: Form
   const {
     data: { publicUrl },
   } = supabase.storage.from("kida-media").getPublicUrl(path);
+  const { width, height } = await getImageDimensions(file);
 
   await supabase.from("kida_media").insert({
     storage_path: path,
@@ -49,6 +51,8 @@ export async function uploadLogo(_prevState: SettingsActionState, formData: Form
     type: "image",
     mime_type: file.type,
     size_bytes: file.size,
+    width,
+    height,
     folder: "branding",
     uploaded_by: user?.id,
   });
@@ -160,6 +164,7 @@ export async function updateHeroSettings(
     const {
       data: { publicUrl },
     } = supabase.storage.from("kida-media").getPublicUrl(path);
+    const { width, height } = await getImageDimensions(file);
 
     await supabase.from("kida_media").insert({
       storage_path: path,
@@ -167,6 +172,8 @@ export async function updateHeroSettings(
       type: "image",
       mime_type: file.type,
       size_bytes: file.size,
+      width,
+      height,
       folder: "hero",
       uploaded_by: user?.id,
     });
@@ -285,6 +292,7 @@ export async function updateAuthPanel(
     const {
       data: { publicUrl },
     } = supabase.storage.from("kida-media").getPublicUrl(path);
+    const { width, height } = await getImageDimensions(file);
 
     await supabase.from("kida_media").insert({
       storage_path: path,
@@ -292,6 +300,8 @@ export async function updateAuthPanel(
       type: "image",
       mime_type: file.type,
       size_bytes: file.size,
+      width,
+      height,
       folder: "auth-panel",
       uploaded_by: user?.id,
     });

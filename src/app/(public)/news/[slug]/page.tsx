@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { RichText } from "@/components/site/rich-text";
+import { AutoFitImage } from "@/components/site/auto-fit-image";
 import { getNewsBySlug } from "@/lib/data/content";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -39,8 +39,16 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
       )}
 
       {news.cover_media?.url && (
-        <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl">
-          <Image src={news.cover_media.url} alt={news.cover_media.alt_text ?? ""} fill priority sizes="100vw" className="object-cover" />
+        <div className="relative mt-8 overflow-hidden rounded-2xl">
+          <AutoFitImage
+            media={news.cover_media}
+            alt={news.title}
+            fallbackUrl={news.cover_media.url}
+            fallbackWidth={1600}
+            fallbackHeight={900}
+            priority
+            sizes="100vw"
+          />
         </div>
       )}
 

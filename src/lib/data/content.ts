@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 
+export type MediaRef = { url: string; alt_text: string | null; width: number | null; height: number | null };
+
+const MEDIA_COLUMNS = "url, alt_text, width, height";
+
 export type NewsItem = {
   id: string;
   title: string;
@@ -7,7 +11,7 @@ export type NewsItem = {
   excerpt: string | null;
   type: "news" | "announcement" | "blog";
   published_at: string | null;
-  cover_media: { url: string; alt_text: string | null } | null;
+  cover_media: MediaRef | null;
 };
 
 export type EventItem = {
@@ -19,7 +23,7 @@ export type EventItem = {
   is_virtual: boolean;
   start_at: string;
   end_at: string | null;
-  cover_media: { url: string; alt_text: string | null } | null;
+  cover_media: MediaRef | null;
 };
 
 export type Testimonial = {
@@ -49,7 +53,7 @@ export type LeadershipMember = {
   email: string | null;
   term_start: string | null;
   term_end: string | null;
-  photo: { url: string; alt_text: string | null } | null;
+  photo: MediaRef | null;
 };
 
 export type Faq = {
@@ -66,7 +70,7 @@ export async function getLatestNews(limit = 3): Promise<NewsItem[]> {
     const supabase = await createClient();
     const { data } = await supabase
       .from("kida_news")
-      .select("id, title, slug, excerpt, type, published_at, cover_media:kida_media(url, alt_text)")
+      .select(`id, title, slug, excerpt, type, published_at, cover_media:kida_media(${MEDIA_COLUMNS})`)
       .eq("status", "published")
       .is("deleted_at", null)
       .order("published_at", { ascending: false })
@@ -86,7 +90,7 @@ function toPublicListItem(row: {
   excerpt: string | null;
   type: "news" | "announcement" | "blog";
   published_at: string | null;
-  cover_media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+  cover_media: MediaRef | MediaRef[] | null;
   category: { name: string } | { name: string }[] | null;
 }): NewsListPageItem {
   const cover = Array.isArray(row.cover_media) ? row.cover_media[0] : row.cover_media;
@@ -120,7 +124,7 @@ export async function getPublishedNews({
     let query = supabase
       .from("kida_news")
       .select(
-        "id, title, slug, excerpt, type, published_at, cover_media:kida_media(url, alt_text), category:kida_news_categories(name)",
+        `id, title, slug, excerpt, type, published_at, cover_media:kida_media(${MEDIA_COLUMNS}), category:kida_news_categories(name)`,
         { count: "exact" },
       )
       .eq("status", "published")
@@ -150,7 +154,7 @@ export async function getNewsBySlug(slug: string): Promise<NewsDetailPageItem | 
     const { data, error } = await supabase
       .from("kida_news")
       .select(
-        "id, title, slug, excerpt, type, published_at, content, tags, cover_media:kida_media(url, alt_text), category:kida_news_categories(name)",
+        `id, title, slug, excerpt, type, published_at, content, tags, cover_media:kida_media(${MEDIA_COLUMNS}), category:kida_news_categories(name)`,
       )
       .eq("slug", slug)
       .eq("status", "published")
@@ -180,7 +184,7 @@ export async function getUpcomingEvents(limit = 3): Promise<EventItem[]> {
     const { data } = await supabase
       .from("kida_events")
       .select(
-        "id, title, slug, category, location_name, is_virtual, start_at, end_at, cover_media:kida_media(url, alt_text)",
+        `id, title, slug, category, location_name, is_virtual, start_at, end_at, cover_media:kida_media(${MEDIA_COLUMNS})`,
       )
       .eq("status", "published")
       .is("deleted_at", null)
@@ -193,8 +197,7 @@ export async function getUpcomingEvents(limit = 3): Promise<EventItem[]> {
   }
 }
 
-const EVENT_LIST_COLUMNS =
-  "id, title, slug, category, location_name, is_virtual, start_at, end_at, cover_media:kida_media(url, alt_text)";
+const EVENT_LIST_COLUMNS = `id, title, slug, category, location_name, is_virtual, start_at, end_at, cover_media:kida_media(${MEDIA_COLUMNS})`;
 
 export async function getPublishedEvents({
   when = "upcoming",
@@ -288,7 +291,7 @@ export type FeaturedAlumniItem = {
   id: string;
   full_name: string;
   role_title: string;
-  photo: { url: string; alt_text: string | null } | null;
+  photo: MediaRef | null;
 };
 
 export async function getFeaturedAlumni(limit = 4): Promise<FeaturedAlumniItem[]> {
@@ -296,7 +299,7 @@ export async function getFeaturedAlumni(limit = 4): Promise<FeaturedAlumniItem[]
     const supabase = await createClient();
     const { data } = await supabase
       .from("kida_featured_alumni")
-      .select("id, full_name, role_title, photo:kida_media(url, alt_text)")
+      .select(`id, full_name, role_title, photo:kida_media(${MEDIA_COLUMNS})`)
       .eq("status", "active")
       .is("deleted_at", null)
       .order("sort_order", { ascending: true })
@@ -340,7 +343,7 @@ export async function getHallOfFame(): Promise<HallOfFameItem[]> {
     const supabase = await createClient();
     const { data } = await supabase
       .from("kida_featured_alumni")
-      .select("id, full_name, role_title, bio, linkedin_url, website_url, photo:kida_media(url, alt_text)")
+      .select(`id, full_name, role_title, bio, linkedin_url, website_url, photo:kida_media(${MEDIA_COLUMNS})`)
       .eq("status", "active")
       .is("deleted_at", null)
       .order("sort_order", { ascending: true });
@@ -386,7 +389,7 @@ export type GalleryAlbumSummary = {
   title: string;
   slug: string;
   description: string | null;
-  cover_media: { url: string; alt_text: string | null } | null;
+  cover_media: MediaRef | null;
   item_count: number;
 };
 
@@ -402,7 +405,7 @@ export async function getPublishedAlbums({
     const { data, count, error } = await supabase
       .from("kida_gallery_albums")
       .select(
-        "id, title, slug, description, cover_media:kida_media(url, alt_text), items:kida_gallery_items(count)",
+        `id, title, slug, description, cover_media:kida_media(${MEDIA_COLUMNS}), items:kida_gallery_items(count)`,
         { count: "exact" },
       )
       .eq("status", "published")
@@ -418,7 +421,7 @@ export async function getPublishedAlbums({
         title: string;
         slug: string;
         description: string | null;
-        cover_media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+        cover_media: MediaRef | MediaRef[] | null;
         items: { count: number }[];
       }[]
     ).map((row) => ({
@@ -441,6 +444,8 @@ export type GalleryPhoto = {
   caption: string | null;
   url: string;
   alt_text: string | null;
+  width: number | null;
+  height: number | null;
 };
 
 export type GalleryAlbumWithPhotos = GalleryAlbumSummary & { photos: GalleryPhoto[] };
@@ -450,7 +455,7 @@ export async function getAlbumBySlug(slug: string): Promise<GalleryAlbumWithPhot
     const supabase = await createClient();
     const { data: album, error } = await supabase
       .from("kida_gallery_albums")
-      .select("id, title, slug, description, cover_media:kida_media(url, alt_text)")
+      .select(`id, title, slug, description, cover_media:kida_media(${MEDIA_COLUMNS})`)
       .eq("slug", slug)
       .eq("status", "published")
       .is("deleted_at", null)
@@ -460,7 +465,7 @@ export async function getAlbumBySlug(slug: string): Promise<GalleryAlbumWithPhot
 
     const { data: items } = await supabase
       .from("kida_gallery_items")
-      .select("id, caption, media:kida_media(url, alt_text)")
+      .select(`id, caption, media:kida_media(${MEDIA_COLUMNS})`)
       .eq("album_id", (album as { id: string }).id)
       .order("sort_order", { ascending: true });
 
@@ -469,18 +474,25 @@ export async function getAlbumBySlug(slug: string): Promise<GalleryAlbumWithPhot
       title: string;
       slug: string;
       description: string | null;
-      cover_media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+      cover_media: MediaRef | MediaRef[] | null;
     };
 
     const photos = (
       (items ?? []) as unknown as {
         id: string;
         caption: string | null;
-        media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+        media: MediaRef | MediaRef[] | null;
       }[]
     ).map((item) => {
       const media = Array.isArray(item.media) ? item.media[0] : item.media;
-      return { id: item.id, caption: item.caption, url: media?.url ?? "", alt_text: media?.alt_text ?? null };
+      return {
+        id: item.id,
+        caption: item.caption,
+        url: media?.url ?? "",
+        alt_text: media?.alt_text ?? null,
+        width: media?.width ?? null,
+        height: media?.height ?? null,
+      };
     });
 
     return {
@@ -502,7 +514,7 @@ export async function getGalleryPreview(limit = 6): Promise<GalleryPhoto[]> {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("kida_gallery_items")
-      .select("id, caption, media:kida_media(url, alt_text), album:kida_gallery_albums!inner(status)")
+      .select(`id, caption, media:kida_media(${MEDIA_COLUMNS}), album:kida_gallery_albums!inner(status)`)
       .eq("album.status", "published")
       .is("album.deleted_at", null)
       .order("created_at", { ascending: false })
@@ -514,11 +526,18 @@ export async function getGalleryPreview(limit = 6): Promise<GalleryPhoto[]> {
       (data ?? []) as unknown as {
         id: string;
         caption: string | null;
-        media: { url: string; alt_text: string | null } | { url: string; alt_text: string | null }[] | null;
+        media: MediaRef | MediaRef[] | null;
       }[]
     ).map((item) => {
       const media = Array.isArray(item.media) ? item.media[0] : item.media;
-      return { id: item.id, caption: item.caption, url: media?.url ?? "", alt_text: media?.alt_text ?? null };
+      return {
+        id: item.id,
+        caption: item.caption,
+        url: media?.url ?? "",
+        alt_text: media?.alt_text ?? null,
+        width: media?.width ?? null,
+        height: media?.height ?? null,
+      };
     });
   } catch {
     return [];
@@ -531,7 +550,7 @@ export async function getLeadership(category?: "executive" | "patron" | "committ
     let query = supabase
       .from("kida_leadership")
       .select(
-        "id, full_name, title, category, bio, county, linkedin_url, email, term_start, term_end, photo:kida_media(url, alt_text)",
+        `id, full_name, title, category, bio, county, linkedin_url, email, term_start, term_end, photo:kida_media(${MEDIA_COLUMNS})`,
       )
       .eq("status", "active")
       .is("deleted_at", null)

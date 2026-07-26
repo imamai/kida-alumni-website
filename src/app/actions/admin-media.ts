@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { isStaff, getCurrentUser } from "@/lib/auth/roles";
+import { getImageDimensions } from "@/lib/media/dimensions";
 import type { MediaType } from "@/lib/data/admin-media";
 
 export type MediaActionState = { status: "idle" | "error" | "success"; message?: string };
@@ -62,6 +63,7 @@ export async function uploadMedia(_prevState: MediaActionState, formData: FormDa
   const {
     data: { publicUrl },
   } = supabase.storage.from("kida-media").getPublicUrl(path);
+  const { width, height } = await getImageDimensions(file);
 
   const { error } = await supabase.from("kida_media").insert({
     storage_path: path,
@@ -69,6 +71,8 @@ export async function uploadMedia(_prevState: MediaActionState, formData: FormDa
     type: mediaTypeFromMime(file.type),
     mime_type: file.type,
     size_bytes: file.size,
+    width,
+    height,
     alt_text: altText,
     folder,
     uploaded_by: user?.id,

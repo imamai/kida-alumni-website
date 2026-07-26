@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { isStaff, getCurrentUser } from "@/lib/auth/roles";
+import { getImageDimensions } from "@/lib/media/dimensions";
 import type { FeaturedAlumniStatus } from "@/lib/data/admin-featured-alumni";
 
 export type FeaturedAlumniActionState = { status: "idle" | "error"; message?: string };
@@ -71,6 +72,7 @@ async function uploadPhoto(formData: FormData): Promise<{ id?: string; error?: s
   const {
     data: { publicUrl },
   } = supabase.storage.from("kida-media").getPublicUrl(path);
+  const { width, height } = await getImageDimensions(file);
 
   const { data: media, error: mediaError } = await supabase
     .from("kida_media")
@@ -80,6 +82,8 @@ async function uploadPhoto(formData: FormData): Promise<{ id?: string; error?: s
       type: "image",
       mime_type: file.type,
       size_bytes: file.size,
+      width,
+      height,
       folder: "featured-alumni",
       uploaded_by: user?.id,
     })

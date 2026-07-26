@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { ArrowLeft, CalendarDays, MapPin, Video, Users, Ticket } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { RichText } from "@/components/site/rich-text";
+import { AutoFitImage } from "@/components/site/auto-fit-image";
 import { getEventBySlug } from "@/lib/data/content";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -37,8 +37,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
       {event.description && <p className="mt-3 text-lg text-muted-foreground text-pretty">{event.description}</p>}
 
       {event.cover_media?.url && (
-        <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl">
-          <Image src={event.cover_media.url} alt={event.cover_media.alt_text ?? ""} fill priority sizes="100vw" className="object-cover" />
+        <div className="relative mt-8 overflow-hidden rounded-2xl">
+          <AutoFitImage
+            media={event.cover_media}
+            alt={event.title}
+            fallbackUrl={event.cover_media.url}
+            fallbackWidth={1600}
+            fallbackHeight={900}
+            priority
+            sizes="100vw"
+          />
         </div>
       )}
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { PageHeader } from "@/components/site/page-header";
 import { RichText } from "@/components/site/rich-text";
+import { AutoFitImage } from "@/components/site/auto-fit-image";
 import { getLeadership } from "@/lib/data/content";
 
 export const metadata: Metadata = { title: "Leadership" };
@@ -40,13 +40,14 @@ export default async function LeadershipPage() {
                 <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {members.map((member) => (
                     <div key={member.id} className="overflow-hidden rounded-2xl border border-border bg-card">
-                      <div className="relative aspect-square">
-                        <Image
-                          src={member.photo?.url ?? PLACEHOLDER_PORTRAIT}
-                          alt={member.photo?.alt_text ?? member.full_name}
-                          fill
+                      <div className="relative">
+                        <AutoFitImage
+                          media={member.photo}
+                          alt={member.full_name}
+                          fallbackUrl={PLACEHOLDER_PORTRAIT}
+                          fallbackWidth={600}
+                          fallbackHeight={600}
                           sizes="(min-width: 1024px) 33vw, 50vw"
-                          className="object-cover"
                         />
                       </div>
                       <div className="p-5">

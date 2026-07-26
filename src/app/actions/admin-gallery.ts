@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { isStaff, getCurrentUser } from "@/lib/auth/roles";
 import { slugify } from "@/lib/slug";
+import { getImageDimensions } from "@/lib/media/dimensions";
 import type { GalleryAlbumStatus } from "@/lib/data/admin-gallery";
 
 export type GalleryActionState = { status: "idle" | "error" | "success"; message?: string };
@@ -182,6 +183,7 @@ export async function uploadGalleryPhotos(
     const {
       data: { publicUrl },
     } = supabase.storage.from("kida-media").getPublicUrl(path);
+    const { width, height } = await getImageDimensions(file);
 
     const { data: media } = await supabase
       .from("kida_media")
@@ -191,6 +193,8 @@ export async function uploadGalleryPhotos(
         type: "image",
         mime_type: file.type,
         size_bytes: file.size,
+        width,
+        height,
         folder: "gallery",
         uploaded_by: user?.id,
       })

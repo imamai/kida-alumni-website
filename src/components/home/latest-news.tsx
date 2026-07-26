@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Reveal } from "@/components/ui/reveal";
+import { AutoFitImage } from "@/components/site/auto-fit-image";
 import type { NewsItem } from "@/lib/data/content";
 
 const PLACEHOLDER_IMAGE =
@@ -19,13 +19,15 @@ export function LatestNews({ items }: { items: NewsItem[] }) {
         {items.map((item, i) => (
           <Reveal key={item.id} delay={i * 0.08}>
             <Link href={`/news/${item.slug}`} className="group block overflow-hidden rounded-2xl border border-border bg-card">
-              <div className="relative aspect-[16/10] overflow-hidden">
-                <Image
-                  src={item.cover_media?.url ?? PLACEHOLDER_IMAGE}
-                  alt={item.cover_media?.alt_text ?? ""}
-                  fill
+              <div className="relative overflow-hidden">
+                <AutoFitImage
+                  media={item.cover_media}
+                  alt={item.title}
+                  fallbackUrl={PLACEHOLDER_IMAGE}
+                  fallbackWidth={1200}
+                  fallbackHeight={750}
                   sizes="(min-width: 768px) 33vw, 100vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
               <div className="p-5">

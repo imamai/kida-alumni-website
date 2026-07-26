@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Reveal } from "@/components/ui/reveal";
 import { Badge } from "@/components/ui/badge";
+import { AutoFitImage } from "@/components/site/auto-fit-image";
 import type { FeaturedAlumniItem } from "@/lib/data/content";
 
 const PLACEHOLDER_PHOTO =
@@ -21,13 +21,15 @@ export function FeaturedAlumni({ alumni }: { alumni: FeaturedAlumniItem[] }) {
         {alumni.map((alum, i) => (
           <Reveal key={alum.id} delay={i * 0.07}>
             <div className="group overflow-hidden rounded-2xl border border-border bg-card">
-              <div className="relative aspect-[4/5] overflow-hidden">
-                <Image
-                  src={alum.photo?.url ?? PLACEHOLDER_PHOTO}
-                  alt={alum.photo?.alt_text ?? alum.full_name}
-                  fill
+              <div className="relative overflow-hidden">
+                <AutoFitImage
+                  media={alum.photo}
+                  alt={alum.full_name}
+                  fallbackUrl={PLACEHOLDER_PHOTO}
+                  fallbackWidth={600}
+                  fallbackHeight={750}
                   sizes="(min-width: 1024px) 25vw, 50vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="transition-transform duration-500 group-hover:scale-105"
                 />
                 <Badge className="absolute top-3 left-3 bg-kida-gold text-kida-charcoal">Featured</Badge>
               </div>

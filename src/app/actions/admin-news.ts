@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { isStaff, getCurrentUser } from "@/lib/auth/roles";
 import { slugify } from "@/lib/slug";
+import { getImageDimensions } from "@/lib/media/dimensions";
 import type { NewsStatus } from "@/lib/data/admin-news";
 
 export type NewsActionState = { status: "idle" | "error"; message?: string };
@@ -80,6 +81,7 @@ async function uploadCover(formData: FormData): Promise<{ id?: string; error?: s
   const {
     data: { publicUrl },
   } = supabase.storage.from("kida-media").getPublicUrl(path);
+  const { width, height } = await getImageDimensions(file);
 
   const { data: media, error: mediaError } = await supabase
     .from("kida_media")
@@ -89,6 +91,8 @@ async function uploadCover(formData: FormData): Promise<{ id?: string; error?: s
       type: "image",
       mime_type: file.type,
       size_bytes: file.size,
+      width,
+      height,
       folder: "news",
       uploaded_by: user?.id,
     })
