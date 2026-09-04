@@ -7,7 +7,7 @@ export type PlatformStatus = {
 };
 
 const STATUS_API_URL =
-  process.env.EDOS_STATUS_API_URL ?? "https://www.edoscentre.co.ke/api/public/website-status";
+  process.env.EDOS_STATUS_API_URL ?? "https://edoscentre.co.ke/api/public/website-status";
 // Set in .env — lets this same file be reused unmodified by future sites.
 const SITE_SLUG = process.env.EDOS_SITE_SLUG ?? "kibabiians-development-association";
 
