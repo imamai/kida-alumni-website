@@ -1,8 +1,15 @@
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { SiteStatusNotice } from "@/components/site/site-status-notice";
 import { getSiteSettings } from "@/lib/data/settings";
+import { getPlatformStatus } from "@/lib/website-status";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+  const platform = await getPlatformStatus();
+  if (platform.status !== "active") {
+    return <SiteStatusNotice {...platform} />;
+  }
+
   const settings = await getSiteSettings();
 
   return (
